@@ -23,40 +23,47 @@ def dot_product(values, weights):
 def get_charactor_vector(vector):
     return vector[0], vector[1], 1
 
+total = 0
 
-random1 = getRandomPoint()
-random2 = getRandomPoint()
-f = getFunction(random1, random2)
-plt.plot([-1, 1], [f(-1), f(1)], color='b')
-w = [0, 0, 0]
-training_data = []
-N = 100
-for i in range(N):
-    p = getRandomPoint()
-    training_data.append((get_charactor_vector(p), evaluate(f, p)))
-    color = 'r' if evaluate(f, p) == 1 else 'c'
-    plt.scatter(p[0], p[1], color=color)
+for i in range(1000):
+    random1 = getRandomPoint()
+    random2 = getRandomPoint()
+    f = getFunction(random1, random2)
+    # plt.plot([-1, 1], [f(-1), f(1)], color='b')
+    w = [0, 0, 0]
+    training_data = []
+    N = 100
+    for i in range(N):
+        p = getRandomPoint()
+        training_data.append((get_charactor_vector(p), evaluate(f, p)))
+        color = 'r' if evaluate(f, p) == 1 else 'c'
+        # plt.scatter(p[0], p[1], color=color)
 
-iteration = 0
-while True:
-    disagreed = 0
-    for vector, expected in training_data:
-        result = 1 if dot_product(vector, w) > 0 else -1
-        if expected != result:
-            disagreed += 1
-            result = evaluate(f, vector)
-            for index, value in enumerate(vector):
-                iteration += 1
-                w[index] += expected * value
-    if disagreed == 0:
-        break
+    iteration = 0
+    while True:
+        disagreed = []
+        for vector, expected in training_data:
+            result = 1 if dot_product(vector, w) > 0 else -1
+            if expected != result:
+                disagreed.append((vector, expected))
 
-print iteration
+        if len(disagreed) == 0:
+            break
+        else:
+            misclassified = disagreed[random.randint(0, len(disagreed) - 1)]
+            for index, value in enumerate(misclassified[0]):
+                w[index] += misclassified[1] * value
+            iteration += 1
+        if disagreed == 0:
+            break
+    total += iteration
 
-if w[1] == 0:
-    pass
-else:
-    plt.plot([-1, 1], [w[0]/w[1] - w[2]/w[1], -w[0]/w[1] - w[2]/w[1]], color='g')
-plt.xlim(-1.0, 1.0)
-plt.ylim(-1.0, 1.0)
-plt.show()
+print total / 1000
+
+#if w[1] == 0:
+#    pass
+#else:
+#    plt.plot([-1, 1], [w[0]/w[1] - w[2]/w[1], -w[0]/w[1] - w[2]/w[1]], color='g')
+#plt.xlim(-1.0, 1.0)
+#plt.ylim(-1.0, 1.0)
+#plt.show()
