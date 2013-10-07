@@ -24,15 +24,17 @@ def get_charactor_vector(vector):
     return vector[0], vector[1], 1
 
 total = 0
+total_not_matched = 0
+ITERATION = 1000
+N = 100
 
-for i in range(1000):
+for i in range(ITERATION):
     random1 = getRandomPoint()
     random2 = getRandomPoint()
     f = getFunction(random1, random2)
     # plt.plot([-1, 1], [f(-1), f(1)], color='b')
     w = [0, 0, 0]
     training_data = []
-    N = 100
     for i in range(N):
         p = getRandomPoint()
         training_data.append((get_charactor_vector(p), evaluate(f, p)))
@@ -58,7 +60,17 @@ for i in range(1000):
             break
     total += iteration
 
-print total / 1000
+    not_matched = 0
+    for i in range(10000):
+        p = getRandomPoint()
+        expected = evaluate(f, p)
+        actual = 1 if dot_product(get_charactor_vector(p), w) > 0 else -1
+        if expected != actual:
+            not_matched += 1
+    total_not_matched += not_matched
+
+print "Average iteration count: %d" % (total / ITERATION)
+print "Average P[f(x) != g(x)]: %f" % (float(total_not_matched) / (ITERATION * 10000))
 
 #if w[1] == 0:
 #    pass
