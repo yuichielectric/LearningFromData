@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+
 import random
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 
 def getRandomPoint():
@@ -23,10 +25,16 @@ def dot_product(values, weights):
 def get_charactor_vector(vector):
     return vector[0], vector[1], 1
 
+# 実験用のパラメータ
+## イテレーション実施数
+ITERATION = 100
+## トレーニングデータの数
+N = 100
+## ターゲット関数と値が一致しない確率を求めるテストを実行する回数
+EQUALITY_TEST_COUNT = 10000
+
 total = 0
 total_not_matched = 0
-ITERATION = 1000
-N = 100
 
 for i in range(ITERATION):
     random1 = getRandomPoint()
@@ -61,7 +69,7 @@ for i in range(ITERATION):
     total += iteration
 
     not_matched = 0
-    for i in range(10000):
+    for i in range(EQUALITY_TEST_COUNT):
         p = getRandomPoint()
         expected = evaluate(f, p)
         actual = 1 if dot_product(get_charactor_vector(p), w) > 0 else -1
@@ -70,7 +78,7 @@ for i in range(ITERATION):
     total_not_matched += not_matched
 
 print "Average iteration count: %d" % (total / ITERATION)
-print "Average P[f(x) != g(x)]: %f" % (float(total_not_matched) / (ITERATION * 10000))
+print "Average P[f(x) != g(x)]: %f" % (float(total_not_matched) / (ITERATION * EQUALITY_TEST_COUNT))
 
 #if w[1] == 0:
 #    pass
