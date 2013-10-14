@@ -47,14 +47,15 @@ EQUALITY_TEST_COUNT = 10000
 ## グラフを表示するかどうかのフラグ
 SHOW_GRAPH = False
 ## wがもとまった後にサンプル外の点の成否を確認する際の点の数
-OUT_OF_SAMPLE_COUNT = 1000
+OUT_OF_SAMPLE_COUNT = -1
 
 in_sample_error_count = 0
 out_of_sample_error_count = 0
+total_iteration = 0
 
 for i in range(ITERATION):
     if i % 50 == 0:
-        print "%d iteration finished." % iz
+        print "%d iteration finished." % i
     random1 = getRandomPoint()
     random2 = getRandomPoint()
     f = getFunction(random1, random2)
@@ -80,10 +81,32 @@ for i in range(ITERATION):
         if evaluate(f, point) != sign(dot(transpose(w), get_charactor_vector(point))):
             in_sample_error_count += 1
 
-    for i in range(OUT_OF_SAMPLE_COUNT):
-        p = getRandomPoint()
-        if evaluate(f, p) != sign(dot(transpose(w), get_charactor_vector(p))):
-            out_of_sample_error_count += 1
+    if OUT_OF_SAMPLE_COUNT > 0:
+        for i in range(OUT_OF_SAMPLE_COUNT):
+            p = getRandomPoint()
+            if evaluate(f, p) != sign(dot(transpose(w), get_charactor_vector(p))):
+                out_of_sample_error_count += 1
+
+    # Exec perceptron based on linear regression weight.
+    iteration = 1
+    while True:
+        disagreed = []
+        for vector, expected in training_data:
+            result = 1 if dot_product(vector, w) > 0 else -1
+            if expected != result:
+                disagreed.append((vector, expected))
+
+        if len(disagreed) == 0:
+            break
+        else:
+            misclassified = disagreed[random.randint(0, len(disagreed) - 1)]
+            for index, value in enumerate(misclassified[0]):
+                w[index] += misclassified[1] * value
+            iteration += 1
+        if disagreed == 0:
+            break
+    total_iteration += iteration
+
 
 if SHOW_GRAPH:
     if w[1] == 0:
@@ -95,4 +118,6 @@ if SHOW_GRAPH:
     plt.show()
 
 print "in sample error rate: %f" % (float(in_sample_error_count) / (ITERATION * N))
-print "out of sample error rate: %f" % (float(out_of_sample_error_count) / (ITERATION * OUT_OF_SAMPLE_COUNT))
+if OUT_OF_SAMPLE_COUNT > 0:
+    print "out of sample error rate: %f" % (float(out_of_sample_error_count) / (ITERATION * OUT_OF_SAMPLE_COUNT))
+print "perceptron exec counts: %f" % (float(total_iteration) / ITERATION)
