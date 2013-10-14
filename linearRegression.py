@@ -40,7 +40,7 @@ def sign(x):
 ## イテレーション実施数
 ITERATION = 1000
 ## トレーニングデータの数
-N = 1000
+N = 10
 ## ターゲット関数と値が一致しない確率を求めるテストを実行する回数
 EQUALITY_TEST_COUNT = 10000
 ## グラフを表示するかどうかのフラグ
@@ -61,23 +61,23 @@ for i in range(ITERATION):
     if SHOW_GRAPH:
         plt.plot([-1, 1], [f(-1), f(1)], color='b')
     w = [0, 0, 0]
-    training_data = []
     x = []
     y = []
     samples = []
     for i in range(N):
         p = getRandomPoint()
-        samples.append(p)
+        expected = evaluate(f, p)
+        samples.append((get_charactor_vector(p), expected))
         x.append(get_charactor_vector(p))
-        y.append([evaluate(f, p)])
+        y.append([expected])
         if SHOW_GRAPH:
             color = 'r' if evaluate(f, p) == 1 else 'c'
             plt.scatter(p[0], p[1], color=color)
 
     w = get_linear_regression_weight(x, y)
 
-    for point in samples:
-        if evaluate(f, point) != sign(dot(transpose(w), get_charactor_vector(point))):
+    for point, expected in samples:
+        if expected != sign(dot(transpose(w), point)):
             in_sample_error_count += 1
 
     if OUT_OF_SAMPLE_COUNT > 0:
@@ -87,15 +87,15 @@ for i in range(ITERATION):
                 out_of_sample_error_count += 1
 
     # Exec perceptron based on linear regression weight.
-    iteration = 1
+    iteration = 0
     while True:
         disagreed = []
-        for vector, expected in training_data:
+        for vector, expected in samples:
             result = 1 if dot_product(vector, w) > 0 else -1
             if expected != result:
                 disagreed.append((vector, expected))
 
-        if len(disagreed) == 0:
+        if len(disagreed) <= 1:
             break
         else:
             misclassified = disagreed[random.randint(0, len(disagreed) - 1)]
