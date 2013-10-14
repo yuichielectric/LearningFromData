@@ -3,7 +3,6 @@
 import random
 from numpy import *
 from numpy.linalg import *
-from numpy.matrixlib import *
 import matplotlib.pyplot as plt
 
 
@@ -41,7 +40,7 @@ def sign(x):
 ## イテレーション実施数
 ITERATION = 1000
 ## トレーニングデータの数
-N = 10
+N = 1000
 ## ターゲット関数と値が一致しない確率を求めるテストを実行する回数
 EQUALITY_TEST_COUNT = 10000
 ## グラフを表示するかどうかのフラグ
